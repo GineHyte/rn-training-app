@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Training App",
+    "slug": "training-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trainingapp"
+    },
+    "android": {
+      "package": "com.trainingapp"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "scheme": "trainingapp"
+  }
+}
