@@ -1,37 +1,10 @@
-# Dependencies
-node_modules/
-package-lock.json
-yarn.lock
-
-# Expo
-.expo/
-.expo-shared/
-dist/
-npm-debug.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
-
-# Environment
-.env
-.env.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
+node_modules
 .DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Testing
-coverage/
+dist
+dist-ssr
+*.local
+.env
+.svelte-kit
+build
+.vercel
+.netlify

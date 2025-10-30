@@ -1,11 +1,11 @@
 # Training App
 
-A complete training management application with React Native frontend and FastAPI backend.
+A complete training management web application with SvelteKit frontend and FastAPI backend.
 
 ## Project Structure
 
 ```
-rnTrainingsApp/
+rn-training-app/
 ├── backend/           # FastAPI + Prisma ORM
 │   ├── app/
 │   │   ├── routes/   # API endpoints
@@ -19,12 +19,12 @@ rnTrainingsApp/
 │   ├── requirements.txt
 │   └── README.md
 │
-└── frontend/         # React Native + Expo
+└── frontend/         # SvelteKit Web App
     ├── src/
-    │   ├── screens/  # UI screens
-    │   └── services/ # API clients
-    ├── App.tsx
+    │   ├── lib/      # Services, stores, API
+    │   └── routes/   # Pages (file-based routing)
     ├── package.json
+    ├── svelte.config.js
     └── README.md
 ```
 
@@ -153,12 +153,17 @@ cd frontend
 npm install
 ```
 
-3. Update API URL in `src/services/api.ts`
+3. Create environment file:
+```bash
+cp .env.example .env
+```
 
 4. Start development server:
 ```bash
-npm start
+npm run dev
 ```
+
+Web app will be available at `http://localhost:5173`
 
 ## API Documentation
 
@@ -211,11 +216,12 @@ See [DOCKER_GUIDE.md](DOCKER_GUIDE.md) for complete Docker documentation.
 - **Password Hashing**: bcrypt (passlib)
 
 ### Frontend
-- **Framework**: React Native
-- **Navigation**: React Navigation
+- **Framework**: SvelteKit 2.0
+- **Language**: TypeScript
+- **Styling**: TailwindCSS
 - **HTTP Client**: Axios
-- **Storage**: AsyncStorage
-- **Development**: Expo
+- **State**: Svelte Stores
+- **Build Tool**: Vite
 
 ## Database Schema
 
@@ -243,10 +249,11 @@ All models have proper foreign key relationships with cascade deletion configure
 - Use Swagger UI for API testing
 
 ### Frontend Development
-- Expo enables hot reload by default
-- Test on emulator, simulator, or physical device
-- Check console for errors
-- Use React DevTools for debugging
+- SvelteKit dev server on port 5173
+- Hot reload (HMR) enabled by default
+- TypeScript type checking
+- TailwindCSS for styling
+- Access at http://localhost:5173
 
 ## Production Deployment
 
@@ -260,14 +267,16 @@ All models have proper foreign key relationships with cascade deletion configure
    - PaaS (Heroku, Render)
 
 ### Frontend
-1. Update API URL to production backend
+1. Update `VITE_API_URL` to production backend
 2. Build production app:
-   - Android: APK/AAB
-   - iOS: IPA
+```bash
+npm run build
+```
 3. Deploy to:
-   - Google Play Store
-   - Apple App Store
-   - Expo Updates
+   - Vercel (recommended)
+   - Netlify
+   - AWS S3 + CloudFront
+   - Any static hosting
 
 ## Security Notes
 
@@ -287,8 +296,9 @@ All models have proper foreign key relationships with cascade deletion configure
 - [ ] Integration with fitness trackers
 - [ ] Meal planning integration
 - [ ] Export workout data
-- [ ] Offline mode support
+- [ ] Offline mode support (PWA)
 - [ ] Real-time collaboration on plans
+- [ ] Mobile app version (Capacitor/React Native)
 
 ## License
 

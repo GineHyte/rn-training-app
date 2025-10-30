@@ -29,7 +29,7 @@ prisma db push
 python main.py
 ```
 
-## 📱 Frontend Setup (PowerShell)
+## 🌐 Frontend Setup (PowerShell)
 
 ```powershell
 # Open new terminal and navigate to frontend
@@ -38,8 +38,11 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start Expo development server
-npm start
+# Create environment file
+cp .env.example .env
+
+# Start SvelteKit development server
+npm run dev
 ```
 
 ## 🔧 Configuration
@@ -52,24 +55,15 @@ JWT_ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
-### Frontend API URL
-Edit `frontend/src/services/api.ts`:
-
-```typescript
-// For Android Emulator
-const API_URL = 'http://10.0.2.2:8000';
-
-// For iOS Simulator
-const API_URL = 'http://localhost:8000';
-
-// For Physical Device (replace with your computer's IP)
-const API_URL = 'http://192.168.1.100:8000';
+### Frontend .env
+```env
+VITE_API_URL=http://localhost:8000
 ```
 
 ## 🎯 First Test
 
 1. **Backend**: Visit http://localhost:8000/docs
-2. **Frontend**: Scan QR code with Expo Go app
+2. **Frontend**: Open http://localhost:5173 in your browser
 3. **Register** a new user
 4. **Login** with credentials
 5. **Create** a plan or exercise
@@ -121,7 +115,7 @@ pip install prisma
 prisma --version
 ```
 
-### "Cannot find module 'react'"
+### "Module not found" errors in frontend
 ```powershell
 cd frontend
 rm -rf node_modules
@@ -142,10 +136,8 @@ netstat -ano | findstr :8000
 taskkill /PID <PID> /F
 ```
 
-### "Can't connect to backend from phone"
-- Use your computer's local IP address
-- Ensure firewall allows connections on port 8000
-- Both devices must be on same WiFi network
+### "Port 5173 already in use"
+Change the port in `vite.config.ts` or kill the process using that port
 
 ## ✅ Verify Setup
 
@@ -158,8 +150,8 @@ http://localhost:8000/docs
 
 ### Frontend Check:
 ```powershell
-# In terminal after 'npm start':
-# Scan QR code with Expo Go app
+# In browser, visit:
+http://localhost:5173
 # Should see login screen
 ```
 
@@ -167,6 +159,6 @@ http://localhost:8000/docs
 
 Backend API: http://localhost:8000
 API Docs: http://localhost:8000/docs
-Frontend: Expo development server
+Frontend Web App: http://localhost:5173
 
 Happy coding! 🚀

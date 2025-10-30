@@ -1,0 +1,28 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { authStore } from '$lib/stores/auth';
+
+	let auth = $state({ isAuthenticated: false, loading: true });
+
+	authStore.subscribe((value) => {
+		auth = value;
+	});
+
+	onMount(() => {
+        console.log("tesetrs")
+		if (!auth.loading) {
+			if (auth.isAuthenticated) {
+				goto('/plans');
+			} else {
+				goto('/login');
+			}
+		}
+	});
+</script>
+
+{#if auth.loading}
+	<div class="min-h-screen flex items-center justify-center">
+		<p class="text-gray-500">Loading...</p>
+	</div>
+{/if}
