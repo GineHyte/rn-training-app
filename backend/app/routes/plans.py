@@ -29,7 +29,10 @@ async def create_plan(
 async def get_plans(
     current_user=Depends(get_current_user), db: Prisma = Depends(get_db)
 ):
-    plans = await db.plan.find_many(where={"userId": current_user.id})
+    # Get user's plans and public plans
+    plans = await db.plan.find_many(
+        where={"OR": [{"userId": current_user.id}, {"public": True}]}
+    )
     return plans
 
 
@@ -37,7 +40,10 @@ async def get_plans(
 async def get_plan(
     plan_id: int, current_user=Depends(get_current_user), db: Prisma = Depends(get_db)
 ):
-    plan = await db.plan.find_first(where={"id": plan_id, "userId": current_user.id})
+    # Allow access to user's own plans or public plans
+    plan = await db.plan.find_first(
+        where={"id": plan_id, "OR": [{"userId": current_user.id}, {"public": True}]}
+    )
     if not plan:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found"
