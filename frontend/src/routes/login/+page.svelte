@@ -18,7 +18,7 @@
 		
 		try {
 			await authStore.login({ username, password });
-			goto('/plans');
+			goto('/home');
 		} catch (err: any) {
 			error = err.response?.data?.detail || 'Login failed';
 		} finally {

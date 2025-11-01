@@ -50,30 +50,6 @@
 </script>
 
 <div class="min-h-screen bg-gray-50">
-	<nav class="bg-white shadow-sm">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex justify-between h-16">
-				<div class="flex items-center">
-					<h1 class="text-xl font-bold text-gray-900">Training App</h1>
-				</div>
-				<div class="flex items-center space-x-4">
-					<button
-						onclick={goToPlans}
-						class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-					>
-						Plans
-					</button>
-					<button
-						onclick={handleLogout}
-						class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-					>
-						Logout
-					</button>
-				</div>
-			</div>
-		</div>
-	</nav>
-
 	<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 		<div class="px-4 py-6 sm:px-0">
 			<div class="flex justify-between items-center mb-6">

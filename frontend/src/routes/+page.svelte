@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { authStore } from '$lib/stores/auth';
 
@@ -9,11 +8,10 @@
 		auth = value;
 	});
 
-	onMount(() => {
-        console.log("tesetrs")
+	$effect(() => {
 		if (!auth.loading) {
 			if (auth.isAuthenticated) {
-				goto('/plans');
+				goto('/home');
 			} else {
 				goto('/login');
 			}

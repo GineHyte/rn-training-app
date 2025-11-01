@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import { exerciseService, type Exercise } from '$lib/services/exerciseService';
 
-	let exerciseId = parseInt($page.params.id || '0');
+	const exerciseId = $derived(parseInt($page.params.id || '0'));
 	let exercise = $state<Exercise | null>(null);
 	let loading = $state(true);
 	let error = $state('');
@@ -17,7 +17,8 @@
 		loading = true;
 		error = '';
 		try {
-			exercise = await exerciseService.getById(exerciseId);
+			const data = await exerciseService.getById(exerciseId);
+			exercise = data;
 		} catch (err: any) {
 			error = err.response?.data?.detail || 'Failed to load exercise';
 		} finally {

@@ -6,7 +6,7 @@
 	import { planWeekService, type PlanWeek } from '$lib/services/planWeekService';
 	import { planTrainingService, type PlanTraining } from '$lib/services/planTrainingService';
 
-	let planId = $state(parseInt($page.params.id));
+	const planId = $derived(parseInt($page.params.id));
 	let plan = $state<Plan | null>(null);
 	let weeks = $state<PlanWeek[]>([]);
 	let weekTrainings = $state<Map<number, PlanTraining[]>>(new Map());
@@ -23,14 +23,18 @@
 		loading = true;
 		error = '';
 		try {
-			plan = await planService.getById(planId);
-			weeks = await planWeekService.getByPlan(planId);
+			const planData = await planService.getById(planId);
+			plan = planData;
+			const weeksData = await planWeekService.getByPlan(planId);
+			weeks = weeksData;
 			
 			// Load trainings for each week
-			for (const week of weeks) {
+			const trainingsMap = new Map<number, PlanTraining[]>();
+			for (const week of weeksData) {
 				const trainings = await planTrainingService.getByWeek(week.id);
-				weekTrainings.set(week.id, trainings);
+				trainingsMap.set(week.id, trainings);
 			}
+			weekTrainings = trainingsMap;
 		} catch (err: any) {
 			error = err.response?.data?.detail || 'Failed to load plan';
 		} finally {

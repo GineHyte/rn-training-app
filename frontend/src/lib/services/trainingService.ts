@@ -30,6 +30,7 @@ export interface CreateTrainingExerciseData {
 	planExerciseId: number;
 	reps: number;
 	kgs: number;
+	timestamp: string;
 }
 
 export const trainingService = {

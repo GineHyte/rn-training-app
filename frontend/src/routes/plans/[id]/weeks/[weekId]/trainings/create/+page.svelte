@@ -3,8 +3,8 @@
 	import { page } from '$app/stores';
 	import { planTrainingService } from '$lib/services/planTrainingService';
 
-	let planId = parseInt($page.params.id || '0');
-	let weekId = parseInt($page.params.weekId || '0');
+	const planId = $derived(parseInt($page.params.id || '0'));
+	const weekId = $derived(parseInt($page.params.weekId || '0'));
 	
 	let name = $state('');
 	let startTime = $state('');

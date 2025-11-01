@@ -6,8 +6,9 @@
 	import { planExerciseService, type PlanExercise } from '$lib/services/planExerciseService';
 	import { trainingService, type Training, type TrainingExercise } from '$lib/services/trainingService';
 	import { exerciseService } from '$lib/services/exerciseService';
+	import Potentiometer from '$lib/components/Potentiometer.svelte';
 
-	let trainingId = parseInt($page.params.id || '0');
+	const trainingId = $derived(parseInt($page.params.id || '0'));
 	let planTraining = $state<PlanTraining | null>(null);
 	let planExercises = $state<PlanExercise[]>([]);
 	let activeTraining = $state<Training | null>(null);
@@ -17,7 +18,7 @@
 	let showAddExercise = $state(false);
 	let availableExercises = $state<any[]>([]);
 	let selectedExerciseId = $state<number>(0);
-	let exerciseIntensity = $state(5);
+	let exerciseIntensity = $state(1);
 
 	// For logging sets
 	let showLogSet = $state(false);
@@ -34,8 +35,10 @@
 		loading = true;
 		error = '';
 		try {
-			planTraining = await planTrainingService.getById(trainingId);
-			planExercises = await planExerciseService.getByTraining(trainingId);
+			const ptData = await planTrainingService.getById(trainingId);
+			planTraining = ptData;
+			const peData = await planExerciseService.getByTraining(trainingId);
+			planExercises = peData;
 		} catch (err: any) {
 			error = err.response?.data?.detail || 'Failed to load training';
 		} finally {
@@ -45,7 +48,8 @@
 
 	async function loadAvailableExercises() {
 		try {
-			availableExercises = await exerciseService.getAll();
+			const exercises = await exerciseService.getAll();
+			availableExercises = exercises;
 		} catch (err: any) {
 			console.error('Failed to load exercises:', err);
 		}
@@ -90,7 +94,7 @@
 			});
 			showAddExercise = false;
 			selectedExerciseId = 0;
-			exerciseIntensity = 5;
+			exerciseIntensity = 1;
 			await loadTraining();
 		} catch (err: any) {
 			error = err.response?.data?.detail || 'Failed to add exercise';
@@ -121,7 +125,8 @@
 				trainingId: activeTraining.id,
 				planExerciseId: selectedPlanExerciseId,
 				reps,
-				kgs
+				kgs,
+				timestamp: new Date().toISOString()
 			});
 			loggedExercises = [...loggedExercises, newSet];
 			showLogSet = false;
@@ -135,6 +140,17 @@
 
 	function getLoggedSetsForExercise(planExerciseId: number) {
 		return loggedExercises.filter(e => e.planExerciseId === planExerciseId);
+	}
+
+	async function deleteSet(setId: number) {
+		if (!confirm('Delete this set?')) return;
+		
+		try {
+			await trainingService.deleteExercise(setId);
+			loggedExercises = loggedExercises.filter(e => e.id !== setId);
+		} catch (err: any) {
+			error = err.response?.data?.detail || 'Failed to delete set';
+		}
 	}
 
 	function goBack() {
@@ -212,7 +228,7 @@
 						</div>
 						<div>
 							<span class="text-gray-500">Intensity:</span>
-							<span class="ml-2 font-medium">{planTraining.intensity}/10</span>
+							<span class="ml-2 font-medium">{planTraining.intensity}/3</span>
 						</div>
 					</div>
 				</div>
@@ -249,12 +265,12 @@
 							</div>
 							<div>
 								<label class="block text-sm font-medium text-gray-700 mb-2">
-									Intensity: {exerciseIntensity}/10
+									Intensity: {exerciseIntensity}/3
 								</label>
 								<input
 									type="range"
 									min="1"
-									max="10"
+									max="3"
 									bind:value={exerciseIntensity}
 									class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
 								/>
@@ -279,46 +295,41 @@
 
 				{#if showLogSet}
 					<div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-						<div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-							<h4 class="text-lg font-medium mb-4">Log Set</h4>
-							<div class="space-y-4">
-								<div>
-									<label class="block text-sm font-medium text-gray-700 mb-2">
-										Reps
-									</label>
-									<input
-										type="number"
-										bind:value={reps}
-										min="1"
-										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-									/>
-								</div>
-								<div>
-									<label class="block text-sm font-medium text-gray-700 mb-2">
-										Weight (kg)
-									</label>
-									<input
-										type="number"
-										bind:value={kgs}
-										min="0"
-										step="0.5"
-										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-									/>
-								</div>
-								<div class="flex gap-4">
-									<button
-										onclick={logSet}
-										class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-									>
-										Log Set
-									</button>
-									<button
-										onclick={() => { showLogSet = false; selectedPlanExerciseId = 0; }}
-										class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-									>
-										Cancel
-									</button>
-								</div>
+						<div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+							<h4 class="text-lg font-medium mb-6 text-center">Log Set</h4>
+							<div class="flex justify-around items-center gap-8">
+								<Potentiometer
+									bind:value={reps}
+									min={1}
+									max={50}
+									step={1}
+									label="Reps"
+									color="#3b82f6"
+								/>
+								
+								<Potentiometer
+									bind:value={kgs}
+									min={0}
+									max={200}
+									step={0.5}
+									label="Weight"
+									unit="kg"
+									color="#10b981"
+								/>
+							</div>
+							<div class="flex gap-4 mt-6">
+								<button
+									onclick={logSet}
+									class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+								>
+									Log Set
+								</button>
+								<button
+									onclick={() => { showLogSet = false; selectedPlanExerciseId = 0; }}
+									class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+								>
+									Cancel
+								</button>
 							</div>
 						</div>
 					</div>
@@ -334,9 +345,11 @@
 							<div class="bg-white shadow rounded-lg p-6">
 								<div class="flex justify-between items-start mb-4">
 									<div>
-										<h4 class="text-lg font-medium text-gray-900">{planExercise.exercise.name}</h4>
-										<p class="text-sm text-gray-500">Intensity: {planExercise.intensity}/10</p>
-										{#if planExercise.exercise.description}
+										<h4 class="text-lg font-medium text-gray-900">
+											{planExercise.exercise?.name || 'Exercise'}
+										</h4>
+										<p class="text-sm text-gray-500">Intensity: {planExercise.intensity}/3</p>
+										{#if planExercise.exercise?.description}
 											<p class="text-sm text-gray-600 mt-2">{planExercise.exercise.description}</p>
 										{/if}
 									</div>
@@ -370,6 +383,13 @@
 														<span class="font-medium">Set {index + 1}:</span>
 														<span>{set.reps} reps × {set.kgs} kg</span>
 														<span class="text-gray-500 text-xs">{new Date(set.timestamp).toLocaleTimeString()}</span>
+														<button
+															onclick={() => deleteSet(set.id)}
+															class="ml-2 px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+															title="Delete set"
+														>
+															×
+														</button>
 													</div>
 												{/each}
 											</div>
