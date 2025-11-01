@@ -54,18 +54,18 @@ async def get_plan_exercises_by_training(
     current_user=Depends(get_current_user),
     db: Prisma = Depends(get_db),
 ):
-    # Verify plan training belongs to user
+    # Verify plan training belongs to user or is public
     plan_training = await db.plantraining.find_unique(
         where={"id": plan_training_id},
         include={"planWeek": {"include": {"plan": True}}},
     )
-    if not plan_training or plan_training.planWeek.plan.userId != current_user.id:
+    if not plan_training or (plan_training.planWeek.plan.userId != current_user.id and not plan_training.planWeek.plan.public):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan training not found"
         )
 
     plan_exercises = await db.planexercise.find_many(
-        where={"planTrainingId": plan_training_id}
+        where={"planTrainingId": plan_training_id}, include={"exercise": True}
     )
     return plan_exercises
 
@@ -79,12 +79,15 @@ async def get_plan_exercise(
     plan_exercise = await db.planexercise.find_unique(
         where={"id": plan_exercise_id},
         include={
-            "planTraining": {"include": {"planWeek": {"include": {"plan": True}}}}
+            "planTraining": {"include": {"planWeek": {"include": {"plan": True}}}},
+            "exercise": True
         },
     )
+    # Allow access if plan belongs to user or is public
     if (
         not plan_exercise
-        or plan_exercise.planTraining.planWeek.plan.userId != current_user.id
+        or (plan_exercise.planTraining.planWeek.plan.userId != current_user.id 
+            and not plan_exercise.planTraining.planWeek.plan.public)
     ):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan exercise not found"

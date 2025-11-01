@@ -33,8 +33,10 @@ async def create_plan_week(
 async def get_plan_weeks_by_plan(
     plan_id: int, current_user=Depends(get_current_user), db: Prisma = Depends(get_db)
 ):
-    # Verify plan belongs to user
-    plan = await db.plan.find_first(where={"id": plan_id, "userId": current_user.id})
+    # Verify plan belongs to user or is public
+    plan = await db.plan.find_first(
+        where={"id": plan_id, "OR": [{"userId": current_user.id}, {"public": True}]}
+    )
     if not plan:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found"
@@ -53,7 +55,8 @@ async def get_plan_week(
     plan_week = await db.planweek.find_unique(
         where={"id": plan_week_id}, include={"plan": True}
     )
-    if not plan_week or plan_week.plan.userId != current_user.id:
+    # Allow access if plan belongs to user or is public
+    if not plan_week or (plan_week.plan.userId != current_user.id and not plan_week.plan.public):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan week not found"
         )
