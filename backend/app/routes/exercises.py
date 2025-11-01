@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 
 from app.database import get_current_user, get_db
 from app.schemas import ExerciseCreate, ExerciseResponse, ExerciseUpdate
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from prisma import Prisma
 
 router = APIRouter(prefix="/exercises", tags=["Exercises"])
@@ -29,12 +29,33 @@ async def create_exercise(
 
 @router.get("/", response_model=List[ExerciseResponse])
 async def get_exercises(
-    current_user=Depends(get_current_user), db: Prisma = Depends(get_db)
+    search: Optional[str] = Query(None, description="Search exercises by name or description"),
+    filter_type: Optional[str] = Query(None, description="Filter by 'my' or 'public'"),
+    current_user=Depends(get_current_user), 
+    db: Prisma = Depends(get_db)
 ):
-    # Get user's exercises and public exercises
-    exercises = await db.exercise.find_many(
-        where={"OR": [{"userId": current_user.id}, {"public": True}]}
-    )
+    # Build the base query
+    where_conditions = {"OR": [{"userId": current_user.id}, {"public": True}]}
+    
+    # Apply filter type
+    if filter_type == "my":
+        where_conditions = {"userId": current_user.id}
+    elif filter_type == "public":
+        where_conditions = {"public": True}
+    
+    # Apply search filter
+    if search:
+        search_lower = search.lower()
+        exercises = await db.exercise.find_many(where=where_conditions)
+        # Filter in Python since Prisma doesn't support case-insensitive contains in all DBs
+        exercises = [
+            ex for ex in exercises 
+            if search_lower in ex.name.lower() or 
+            (ex.description and search_lower in ex.description.lower())
+        ]
+    else:
+        exercises = await db.exercise.find_many(where=where_conditions)
+    
     return exercises
 
 

@@ -29,8 +29,13 @@ export interface UpdateExerciseData {
 }
 
 export const exerciseService = {
-	async getAll(): Promise<Exercise[]> {
-		const response = await api.get<Exercise[]>('/exercises/');
+	async getAll(search?: string, filterType?: 'my' | 'public'): Promise<Exercise[]> {
+		const params = new URLSearchParams();
+		if (search) params.append('search', search);
+		if (filterType) params.append('filter_type', filterType);
+		
+		const url = `/exercises/${params.toString() ? '?' + params.toString() : ''}`;
+		const response = await api.get<Exercise[]>(url);
 		return response.data;
 	},
 

@@ -160,6 +160,7 @@ class PlanExerciseResponse(PlanExerciseBase):
     id: int
     planTrainingId: int
     exerciseId: int
+    exercise: Optional["ExerciseResponse"] = None
     createdAt: datetime
     updatedAt: datetime
 
@@ -267,3 +268,7 @@ class DecliningTrainingExercisePositionResponse(DecliningTrainingExercisePositio
 
     class Config:
         from_attributes = True
+
+
+# Update forward references
+PlanExerciseResponse.model_rebuild()

@@ -43,7 +43,8 @@ async def create_plan_exercise(
             "intensity": plan_exercise.intensity,
             "planTrainingId": plan_exercise.planTrainingId,
             "exerciseId": plan_exercise.exerciseId,
-        }
+        },
+        include={"exercise": True}
     )
     return new_plan_exercise
 
@@ -118,7 +119,9 @@ async def update_plan_exercise(
 
     update_data = plan_exercise_data.model_dump(exclude_unset=True)
     updated_plan_exercise = await db.planexercise.update(
-        where={"id": plan_exercise_id}, data=update_data
+        where={"id": plan_exercise_id}, 
+        data=update_data,
+        include={"exercise": True}
     )
     return updated_plan_exercise
 
