@@ -26,6 +26,10 @@
 	let reps = $state<number>(10);
 	let kgs = $state<number>(20);
 
+	// For exercise details modal
+	let showExerciseDetails = $state(false);
+	let selectedExerciseDetails = $state<any>(null);
+
 	onMount(async () => {
 		await loadTraining();
 		await loadAvailableExercises();
@@ -140,6 +144,16 @@
 
 	function getLoggedSetsForExercise(planExerciseId: number) {
 		return loggedExercises.filter(e => e.planExerciseId === planExerciseId);
+	}
+
+	function showExerciseInfo(exercise: any) {
+		selectedExerciseDetails = exercise;
+		showExerciseDetails = true;
+	}
+
+	function closeExerciseDetails() {
+		showExerciseDetails = false;
+		selectedExerciseDetails = null;
 	}
 
 	async function deleteSet(setId: number) {
@@ -344,14 +358,16 @@
 						{#each planExercises as planExercise}
 							<div class="bg-white shadow rounded-lg p-6">
 								<div class="flex justify-between items-start mb-4">
-									<div>
-										<h4 class="text-lg font-medium text-gray-900">
-											{planExercise.exercise?.name || 'Exercise'}
-										</h4>
+									<div class="flex-1">
+										<button
+											onclick={() => showExerciseInfo(planExercise.exercise)}
+											class="text-left hover:text-blue-600 transition"
+										>
+											<h4 class="text-lg font-medium text-gray-900 hover:underline">
+												{planExercise.exercise?.name || 'Exercise'}
+											</h4>
+										</button>
 										<p class="text-sm text-gray-500">Intensity: {planExercise.intensity}/3</p>
-										{#if planExercise.exercise?.description}
-											<p class="text-sm text-gray-600 mt-2">{planExercise.exercise.description}</p>
-										{/if}
 									</div>
 									<div class="flex gap-2">
 										{#if activeTraining}
@@ -403,4 +419,73 @@
 			{/if}
 		</div>
 	</div>
+
+	<!-- Exercise Details Modal -->
+	{#if showExerciseDetails && selectedExerciseDetails}
+		<div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+			<div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+				<div class="flex justify-between items-start mb-4">
+					<h3 class="text-2xl font-bold text-gray-900">{selectedExerciseDetails.name}</h3>
+					<button
+						onclick={closeExerciseDetails}
+						class="text-gray-400 hover:text-gray-600 text-2xl"
+					>
+						×
+					</button>
+				</div>
+
+				{#if selectedExerciseDetails.image}
+					<div class="mb-4">
+						<img
+							src={selectedExerciseDetails.image}
+							alt={selectedExerciseDetails.name}
+							class="w-full rounded-lg shadow-md"
+						/>
+					</div>
+				{/if}
+
+				{#if selectedExerciseDetails.description}
+					<div class="mb-4">
+						<h4 class="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+						<p class="text-gray-700 whitespace-pre-wrap">{selectedExerciseDetails.description}</p>
+					</div>
+				{/if}
+
+				{#if selectedExerciseDetails.video}
+					<div class="mb-4">
+						<h4 class="text-lg font-semibold text-gray-900 mb-2">Video</h4>
+						{#if selectedExerciseDetails.video.includes('youtube.com') || selectedExerciseDetails.video.includes('youtu.be')}
+							<div class="aspect-video">
+								<iframe
+									src={selectedExerciseDetails.video.replace('watch?v=', 'embed/')}
+									class="w-full h-full rounded-lg"
+									frameborder="0"
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+									allowfullscreen
+								></iframe>
+							</div>
+						{:else}
+							<a
+								href={selectedExerciseDetails.video}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-blue-600 hover:underline"
+							>
+								Watch Video
+							</a>
+						{/if}
+					</div>
+				{/if}
+
+				<div class="flex justify-end mt-6">
+					<button
+						onclick={closeExerciseDetails}
+						class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+					>
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
