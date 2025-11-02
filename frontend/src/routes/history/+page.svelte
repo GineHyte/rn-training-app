@@ -234,13 +234,16 @@
 					{:else}
 						<div class="space-y-3">
 							{#each filteredTrainings as training}
-								<div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition">
+								<button
+									onclick={() => goto(`/history/${training.id}`)}
+									class="w-full border border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-md transition text-left"
+								>
 									<div class="flex justify-between items-start mb-2">
 										<div class="text-sm font-medium text-gray-900">
-											{new Date(training.startTime).toLocaleTimeString([], {
+											{training.startTime ? new Date(training.startTime).toLocaleTimeString([], {
 												hour: '2-digit',
 												minute: '2-digit'
-											})}
+											}) : 'No time set'}
 										</div>
 										<span
 											class={`text-xs px-2 py-1 rounded ${
@@ -253,7 +256,8 @@
 										</span>
 									</div>
 									<div class="text-sm text-gray-600">{formatDuration(training)}</div>
-								</div>
+									<div class="text-xs text-blue-600 mt-2">Click to view details →</div>
+								</button>
 							{/each}
 						</div>
 					{/if}

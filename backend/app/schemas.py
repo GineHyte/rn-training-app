@@ -145,6 +145,10 @@ class ExerciseResponse(ExerciseBase):
 # PlanExercise Schemas
 class PlanExerciseBase(BaseModel):
     intensity: int
+    minReps: int = 8
+    maxReps: int = 12
+    minSets: int = 3
+    maxSets: int = 4
 
 
 class PlanExerciseCreate(PlanExerciseBase):
@@ -154,6 +158,10 @@ class PlanExerciseCreate(PlanExerciseBase):
 
 class PlanExerciseUpdate(BaseModel):
     intensity: Optional[int] = None
+    minReps: Optional[int] = None
+    maxReps: Optional[int] = None
+    minSets: Optional[int] = None
+    maxSets: Optional[int] = None
 
 
 class PlanExerciseResponse(PlanExerciseBase):

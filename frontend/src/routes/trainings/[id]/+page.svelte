@@ -17,7 +17,13 @@
     let loading = $state(true);
     let error = $state('');
     let showExerciseSelector = $state(false);
-    let exerciseIntensity = $state(1);
+    let showIntensitySelector = $state(false);
+    let selectedExercise = $state<Exercise | null>(null);
+    let exerciseIntensity = $state(2);
+    let minReps = $state(8);
+    let maxReps = $state(12);
+    let minSets = $state(3);
+    let maxSets = $state(4);
     let showLogSet = $state(false);
     let selectedPlanExerciseId = $state<number>(0);
     let reps = $state<number>(10);
@@ -70,14 +76,31 @@
     }
 
     async function addExerciseToPlan(exercise: Exercise) {
+        selectedExercise = exercise;
+        showExerciseSelector = false;
+        showIntensitySelector = true;
+    }
+
+    async function confirmAddExercise() {
+        if (!selectedExercise) return;
+        
         try {
             await planExerciseService.create({
                 planTrainingId: trainingId,
-                exerciseId: exercise.id,
-                intensity: exerciseIntensity
+                exerciseId: selectedExercise.id,
+                intensity: exerciseIntensity,
+                minReps,
+                maxReps,
+                minSets,
+                maxSets
             });
-            exerciseIntensity = 1;
-            showExerciseSelector = false;
+            exerciseIntensity = 2;
+            minReps = 8;
+            maxReps = 12;
+            minSets = 3;
+            maxSets = 4;
+            selectedExercise = null;
+            showIntensitySelector = false;
             await loadTraining();
         } catch (err: any) {
             error = err.response?.data?.detail || 'Failed to add exercise';
@@ -199,7 +222,7 @@
             {#if activeTraining}
                 <div class="rounded-md bg-green-50 p-4 mb-4 border-2 border-green-500">
                     <p class="text-sm text-green-800 font-medium">
-                        🏋️ Training in progress - Started at {new Date(activeTraining.startTime).toLocaleTimeString()}
+                        🏋️ Training in progress{activeTraining.startTime ? ` - Started at ${new Date(activeTraining.startTime).toLocaleTimeString()}` : ''}
                     </p>
                 </div>
             {/if}
@@ -216,11 +239,11 @@
                     <div class="grid grid-cols-3 gap-4 text-sm">
                         <div>
                             <span class="text-gray-500">Start Time:</span>
-                            <span class="ml-2 font-medium">{new Date(planTraining.startTime).toLocaleTimeString()}</span>
+                            <span class="ml-2 font-medium">{planTraining.startTime ? new Date(planTraining.startTime).toLocaleTimeString() : 'Not set'}</span>
                         </div>
                         <div>
                             <span class="text-gray-500">End Time:</span>
-                            <span class="ml-2 font-medium">{new Date(planTraining.endTime).toLocaleTimeString()}</span>
+                            <span class="ml-2 font-medium">{planTraining.endTime ? new Date(planTraining.endTime).toLocaleTimeString() : 'Not set'}</span>
                         </div>
                         <div>
                             <span class="text-gray-500">Intensity:</span>
@@ -261,7 +284,17 @@
                                                 {planExercise.exercise?.name || 'Exercise'}
                                             </h4>
                                         </button>
-                                        <p class="text-sm text-gray-500">Intensity: {planExercise.intensity}/3</p>
+                                        <div class="mt-2 space-y-1">
+                                            <p class="text-sm text-gray-500">
+                                                💪 Intensity: {planExercise.intensity}/3
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                🔁 Reps: {planExercise.minReps}-{planExercise.maxReps}
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                📊 Sets: {planExercise.minSets}-{planExercise.maxSets}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div class="flex gap-2">
                                         {#if activeTraining}
@@ -321,6 +354,123 @@
         onClose={() => showExerciseSelector = false}
         onSelect={addExerciseToPlan}
     />
+
+    <!-- Intensity Selector Modal -->
+    {#if showIntensitySelector && selectedExercise}
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <h4 class="text-lg font-medium mb-4 text-center">Configure Exercise</h4>
+                <p class="text-sm text-gray-600 mb-6 text-center">
+                    <span class="font-semibold text-gray-900">{selectedExercise.name}</span>
+                </p>
+                
+                <!-- Intensity -->
+                <div class="mb-6">
+                    <label for="exercise-intensity" class="block text-sm font-medium text-gray-700 mb-2">
+                        Intensity: {exerciseIntensity}/3
+                    </label>
+                    <input
+                        id="exercise-intensity"
+                        type="range"
+                        min="1"
+                        max="3"
+                        bind:value={exerciseIntensity}
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Light</span>
+                        <span>Moderate</span>
+                        <span>Intense</span>
+                    </div>
+                </div>
+
+                <!-- Reps Range -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Reps Range: {minReps} - {maxReps}
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="min-reps" class="block text-xs text-gray-600 mb-1">Min Reps</label>
+                            <input
+                                id="min-reps"
+                                type="number"
+                                min="1"
+                                max={maxReps}
+                                bind:value={minReps}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label for="max-reps" class="block text-xs text-gray-600 mb-1">Max Reps</label>
+                            <input
+                                id="max-reps"
+                                type="number"
+                                min={minReps}
+                                max="100"
+                                bind:value={maxReps}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sets Range -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Sets Range: {minSets} - {maxSets}
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="min-sets" class="block text-xs text-gray-600 mb-1">Min Sets</label>
+                            <input
+                                id="min-sets"
+                                type="number"
+                                min="1"
+                                max={maxSets}
+                                bind:value={minSets}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label for="max-sets" class="block text-xs text-gray-600 mb-1">Max Sets</label>
+                            <input
+                                id="max-sets"
+                                type="number"
+                                min={minSets}
+                                max="20"
+                                bind:value={maxSets}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button
+                        onclick={confirmAddExercise}
+                        class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium"
+                    >
+                        Add Exercise
+                    </button>
+                    <button
+                        onclick={() => { 
+                            showIntensitySelector = false; 
+                            selectedExercise = null; 
+                            exerciseIntensity = 2;
+                            minReps = 8;
+                            maxReps = 12;
+                            minSets = 3;
+                            maxSets = 4;
+                        }}
+                        class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 
     <!-- Log Set Modal -->
     {#if showLogSet}

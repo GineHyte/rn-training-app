@@ -38,13 +38,24 @@ async def create_plan_exercise(
             status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found"
         )
 
+    # Only include fields that were actually provided by the client so the DB
+    # can apply its own defaults when appropriate. Use Pydantic's
+    # model_dump(exclude_unset=True) to detect which values were sent.
+    provided = plan_exercise.model_dump(exclude_unset=True)
+
+    data = {
+        "planTrainingId": plan_exercise.planTrainingId,
+        "exerciseId": plan_exercise.exerciseId,
+    }
+
+    # copy allowed optional fields if present in the request
+    for key in ("intensity", "minReps", "maxReps", "minSets", "maxSets"):
+        if key in provided:
+            data[key] = provided[key]
+
     new_plan_exercise = await db.planexercise.create(
-        data={
-            "intensity": plan_exercise.intensity,
-            "planTrainingId": plan_exercise.planTrainingId,
-            "exerciseId": plan_exercise.exerciseId,
-        },
-        include={"exercise": True}
+        data=data,
+        include={"exercise": True},
     )
     return new_plan_exercise
 

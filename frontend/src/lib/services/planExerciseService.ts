@@ -3,6 +3,10 @@ import api from '$lib/api';
 export interface PlanExercise {
 	id: number;
 	intensity: number;
+	minReps: number;
+	maxReps: number;
+	minSets: number;
+	maxSets: number;
 	planTrainingId: number;
 	exerciseId: number;
 	exercise: {
@@ -20,6 +24,10 @@ export interface CreatePlanExerciseData {
 	planTrainingId: number;
 	exerciseId: number;
 	intensity: number;
+	minReps?: number;
+	maxReps?: number;
+	minSets?: number;
+	maxSets?: number;
 }
 
 export const planExerciseService = {

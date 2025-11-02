@@ -76,6 +76,10 @@ model PlanTraining {
 model PlanExercise {
   id        Int      @id @default(autoincrement())
   intensity Int
+  minReps   Int      @default(8)
+  maxReps   Int      @default(12)
+  minSets   Int      @default(3)
+  maxSets   Int      @default(4)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
