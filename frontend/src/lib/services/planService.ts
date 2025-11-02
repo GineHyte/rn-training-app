@@ -3,7 +3,7 @@ import api from '$lib/api';
 export interface Plan {
 	id: number;
 	name: string;
-	startDate: string;
+	startDate: string | null;
 	public: boolean;
 	userId: number;
 	createdAt: string;
@@ -12,13 +12,13 @@ export interface Plan {
 
 export interface CreatePlanData {
 	name: string;
-	startDate: string;
+	startDate?: string | null;
 	public: boolean;
 }
 
 export interface UpdatePlanData {
 	name?: string;
-	startDate?: string;
+	startDate?: string | null;
 	public?: boolean;
 }
 

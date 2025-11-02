@@ -2,7 +2,7 @@ import api from '$lib/api';
 
 export interface PlanWeek {
 	id: number;
-	startDate: string;
+	startDate: string | null;
 	planId: number;
 	createdAt: string;
 	updatedAt: string;
@@ -10,7 +10,7 @@ export interface PlanWeek {
 
 export interface CreatePlanWeekData {
 	planId: number;
-	startDate: string;
+	startDate?: string | null;
 }
 
 export const planWeekService = {

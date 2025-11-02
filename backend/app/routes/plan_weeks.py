@@ -23,8 +23,12 @@ async def create_plan_week(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found"
         )
 
+    from datetime import datetime
     new_plan_week = await db.planweek.create(
-        data={"startDate": plan_week.startDate, "planId": plan_week.planId}
+        data={
+            "startDate": plan_week.startDate if plan_week.startDate else datetime.now(),
+            "planId": plan_week.planId
+        }
     )
     return new_plan_week
 

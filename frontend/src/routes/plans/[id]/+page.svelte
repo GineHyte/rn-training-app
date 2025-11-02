@@ -43,15 +43,10 @@
 	}
 
 	async function addWeek() {
-		if (!newWeekDate) {
-			error = 'Please select a date';
-			return;
-		}
-
 		try {
 			await planWeekService.create({
 				planId,
-				startDate: new Date(newWeekDate).toISOString()
+				startDate: newWeekDate ? new Date(newWeekDate).toISOString() : new Date().toISOString()
 			});
 			showAddWeek = false;
 			newWeekDate = '';
@@ -122,7 +117,7 @@
 					<div class="grid grid-cols-2 gap-4 text-sm">
 						<div>
 							<span class="text-gray-500">Start Date:</span>
-							<span class="ml-2 font-medium">{new Date(plan.startDate).toLocaleDateString()}</span>
+							<span class="ml-2 font-medium">{plan.startDate ? new Date(plan.startDate).toLocaleDateString() : 'Not set'}</span>
 						</div>
 						<div>
 							<span class="text-gray-500">Visibility:</span>
@@ -144,10 +139,12 @@
 				{#if showAddWeek}
 					<div class="bg-white shadow rounded-lg p-6 mb-6">
 						<h4 class="text-lg font-medium mb-4">Add New Week</h4>
+						<p class="text-sm text-gray-500 mb-3">Leave date empty to use today's date</p>
 						<div class="flex gap-4">
 							<input
 								type="date"
 								bind:value={newWeekDate}
+								placeholder="Optional - defaults to today"
 								class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
 							/>
 							<button
@@ -178,7 +175,7 @@
 									<div>
 										<h4 class="text-lg font-medium text-gray-900">Week {index + 1}</h4>
 										<p class="text-sm text-gray-500">
-											Starts: {new Date(week.startDate).toLocaleDateString()}
+											Starts: {week.startDate ? new Date(week.startDate).toLocaleDateString() : 'Date not set'}
 										</p>
 									</div>
 									<div class="flex gap-2">
@@ -207,8 +204,14 @@
 											>
 												<h5 class="font-medium text-gray-900 mb-2">{training.name}</h5>
 												<div class="text-sm text-gray-500 space-y-1">
-													<p>🕐 {new Date(training.startTime).toLocaleTimeString()} - {new Date(training.endTime).toLocaleTimeString()}</p>
-													<p>💪 Intensity: {training.intensity}/10</p>
+													{#if training.startTime && training.endTime}
+														<p>🕐 {new Date(training.startTime).toLocaleTimeString()} - {new Date(training.endTime).toLocaleTimeString()}</p>
+													{:else if training.startTime}
+														<p>🕐 Starts: {new Date(training.startTime).toLocaleTimeString()}</p>
+													{:else}
+														<p>🕐 Time not set</p>
+													{/if}
+													<p>💪 Intensity: {training.intensity}/3</p>
 												</div>
 											</div>
 										{/each}

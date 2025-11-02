@@ -9,18 +9,18 @@
 	let name = $state('');
 	let startTime = $state('');
 	let endTime = $state('');
-	let intensity = $state(5);
+	let intensity = $state(2);
 	let loading = $state(false);
 	let error = $state('');
 
 	async function handleSubmit() {
-		if (!name || !startTime || !endTime) {
-			error = 'Please fill in all required fields';
+		if (!name) {
+			error = 'Please enter a training name';
 			return;
 		}
 
-		if (intensity < 1 || intensity > 10) {
-			error = 'Intensity must be between 1 and 10';
+		if (intensity < 1 || intensity > 3) {
+			error = 'Intensity must be between 1 and 3';
 			return;
 		}
 
@@ -28,13 +28,16 @@
 		error = '';
 		
 		try {
-			// Create full datetime by combining date with time
+			// Create full datetime by combining date with time or use defaults
 			const today = new Date().toISOString().split('T')[0];
+			const start = startTime ? `${today}T${startTime}:00` : null;
+			const end = endTime ? `${today}T${endTime}:00` : null;
+			
 			await planTrainingService.create({
 				planWeekId: weekId,
 				name,
-				startTime: `${today}T${startTime}:00`,
-				endTime: `${today}T${endTime}:00`,
+				startTime: start,
+				endTime: end,
 				intensity
 			});
 			goto(`/plans/${planId}`);
@@ -94,24 +97,22 @@
 					<div class="grid grid-cols-2 gap-4 mb-4">
 						<div>
 							<label for="startTime" class="block text-sm font-medium text-gray-700 mb-2">
-								Start Time *
+								Start Time (Optional)
 							</label>
 							<input
 								id="startTime"
 								type="time"
-								required
 								bind:value={startTime}
 								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
 							/>
 						</div>
 						<div>
 							<label for="endTime" class="block text-sm font-medium text-gray-700 mb-2">
-								End Time *
+								End Time (Optional)
 							</label>
 							<input
 								id="endTime"
 								type="time"
-								required
 								bind:value={endTime}
 								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
 							/>
@@ -120,13 +121,13 @@
 
 					<div class="mb-6">
 						<label for="intensity" class="block text-sm font-medium text-gray-700 mb-2">
-							Intensity: {intensity}/10
+							Intensity: {intensity}/3
 						</label>
 						<input
 							id="intensity"
 							type="range"
 							min="1"
-							max="10"
+							max="3"
 							bind:value={intensity}
 							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
 						/>

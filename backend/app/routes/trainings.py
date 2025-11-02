@@ -27,7 +27,7 @@ async def create_training(
     
     new_training = await db.training.create(
         data={
-            "startTime": training.startTime,
+            "startTime": training.startTime if training.startTime else datetime.now(),
             "planTrainingId": training.planTrainingId
         }
     )

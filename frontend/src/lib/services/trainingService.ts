@@ -2,8 +2,8 @@ import api from '$lib/api';
 
 export interface Training {
 	id: number;
-	startTime: string;
-	endTime?: string;
+	startTime: string | null;
+	endTime: string | null;
 	planTrainingId: number;
 	createdAt: string;
 	updatedAt: string;
@@ -11,7 +11,7 @@ export interface Training {
 
 export interface CreateTrainingData {
 	planTrainingId: number;
-	startTime: string;
+	startTime?: string | null;
 }
 
 export interface TrainingExercise {

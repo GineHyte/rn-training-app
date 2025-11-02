@@ -14,10 +14,11 @@ async def create_plan(
     current_user=Depends(get_current_user),
     db: Prisma = Depends(get_db),
 ):
+    from datetime import datetime
     new_plan = await db.plan.create(
         data={
             "name": plan.name,
-            "startDate": plan.startDate,
+            "startDate": plan.startDate if plan.startDate else datetime.now(),
             "public": plan.public,
             "userId": current_user.id,
         }

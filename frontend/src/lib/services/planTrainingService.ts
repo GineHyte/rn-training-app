@@ -3,8 +3,8 @@ import api from '$lib/api';
 export interface PlanTraining {
 	id: number;
 	name: string;
-	startTime: string;
-	endTime: string;
+	startTime: string | null;
+	endTime: string | null;
 	intensity: number;
 	planWeekId: number;
 	createdAt: string;
@@ -14,8 +14,8 @@ export interface PlanTraining {
 export interface CreatePlanTrainingData {
 	planWeekId: number;
 	name: string;
-	startTime: string;
-	endTime: string;
+	startTime: string | null;
+	endTime: string | null;
 	intensity: number;
 }
 

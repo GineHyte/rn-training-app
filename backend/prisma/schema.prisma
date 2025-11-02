@@ -26,12 +26,12 @@ model User {
 }
 
 model Plan {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  startDate DateTime
-  public    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  startDate DateTime?
+  public    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Relations
   userId    Int
@@ -42,10 +42,10 @@ model Plan {
 }
 
 model PlanWeek {
-  id        Int      @id @default(autoincrement())
-  startDate DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  startDate DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Relations
   planId    Int
@@ -56,13 +56,13 @@ model PlanWeek {
 }
 
 model PlanTraining {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  startTime  DateTime
-  endTime    DateTime
+  startTime  DateTime?
+  endTime    DateTime?
   intensity  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   // Relations
   planWeekId Int
@@ -109,11 +109,11 @@ model Exercise {
 }
 
 model Training {
-  id        Int      @id @default(autoincrement())
-  startTime DateTime
+  id        Int       @id @default(autoincrement())
+  startTime DateTime?
   endTime   DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Relations
   planTrainingId    Int

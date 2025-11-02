@@ -9,8 +9,8 @@
 	let error = $state('');
 
 	async function handleSubmit() {
-		if (!name || !startDate) {
-			error = 'Please fill in all required fields';
+		if (!name) {
+			error = 'Please enter a plan name';
 			return;
 		}
 
@@ -20,7 +20,7 @@
 		try {
 			await planService.create({
 				name,
-				startDate: new Date(startDate).toISOString(),
+				startDate: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
 				public: isPublic
 			});
 			goto('/plans');
@@ -79,12 +79,11 @@
 
 					<div class="mb-4">
 						<label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">
-							Start Date *
+							Start Date (Optional - defaults to today)
 						</label>
 						<input
 							id="startDate"
 							type="date"
-							required
 							bind:value={startDate}
 							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
 						/>

@@ -25,11 +25,15 @@ async def create_plan_training(
             status_code=status.HTTP_404_NOT_FOUND, detail="Plan week not found"
         )
 
+    from datetime import datetime, time
+    # Set default times if not provided
+    default_time = datetime.combine(datetime.now().date(), time(12, 0))
+    
     new_plan_training = await db.plantraining.create(
         data={
             "name": plan_training.name,
-            "startTime": plan_training.startTime,
-            "endTime": plan_training.endTime,
+            "startTime": plan_training.startTime if plan_training.startTime else default_time,
+            "endTime": plan_training.endTime if plan_training.endTime else default_time,
             "intensity": plan_training.intensity,
             "planWeekId": plan_training.planWeekId,
         }

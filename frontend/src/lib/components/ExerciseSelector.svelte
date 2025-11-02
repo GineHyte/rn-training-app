@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { exerciseService } from '$lib/services/exerciseService';
+    import type { Exercise as ExerciseBase } from '$lib/services/exerciseService';
 	
-	interface Exercise {
+	interface Exercise extends ExerciseBase {
 		id: number;
 		name: string;
 		description?: string;
@@ -14,7 +15,7 @@
 	interface Props {
 		isOpen: boolean;
 		onClose: () => void;
-		onSelect: (exercise: Exercise) => void;
+		onSelect: (exercise: Exercise) => Promise<void>;
 		selectedExerciseId?: number;
 	}
 

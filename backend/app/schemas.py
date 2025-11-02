@@ -35,7 +35,7 @@ class Token(BaseModel):
 # Plan Schemas
 class PlanBase(BaseModel):
     name: str
-    startDate: datetime
+    startDate: Optional[datetime] = None
     public: bool = False
 
 
@@ -61,7 +61,7 @@ class PlanResponse(PlanBase):
 
 # PlanWeek Schemas
 class PlanWeekBase(BaseModel):
-    startDate: datetime
+    startDate: Optional[datetime] = None
 
 
 class PlanWeekCreate(PlanWeekBase):
@@ -85,8 +85,8 @@ class PlanWeekResponse(PlanWeekBase):
 # PlanTraining Schemas
 class PlanTrainingBase(BaseModel):
     name: str
-    startTime: datetime
-    endTime: datetime
+    startTime: Optional[datetime] = None
+    endTime: Optional[datetime] = None
     intensity: int
 
 
@@ -170,13 +170,13 @@ class PlanExerciseResponse(PlanExerciseBase):
 
 # Training Schemas
 class TrainingBase(BaseModel):
-    startTime: datetime
+    startTime: Optional[datetime] = None
     endTime: Optional[datetime] = None
 
 
 class TrainingCreate(BaseModel):
     planTrainingId: int
-    startTime: datetime
+    startTime: Optional[datetime] = None
 
 
 class TrainingUpdate(BaseModel):
